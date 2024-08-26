@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Lambda application that manages a leaderboard.
+
+Globals:
+  Function:
+    Timeout: 10  # adjust for database latency
+    Runtime: nodejs14.x
+    Handler: src/app.handler
+    MemorySize: 256
+
+Resources:
+  LeaderboardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/app.handler
+      Runtime: nodejs20.x
+      Environment:
+        Variables:
+          NEON_DB_URL: "postgresql://Leaderboard_owner:6i0VTIBxuwrq@ep-square-brook-a56bzbfg.us-east-2.aws.neon.tech/Leaderboard?sslmode=require"
+      Events:
+        AddPoints:
+          Type: Api
+          Properties:
+            Path: /points
+            Method: post
+        GetLeaderboard:
+          Type: Api
+          Properties:
+            Path: /leaderboard
+            Method: get
+        GetParticipant:
+          Type: Api
+          Properties:
+            Path: /participant/{userID}
+            Method: get
+        DeleteParticipant:
+          Type: Api
+          Properties:
+            Path: /participant/{userID}
+            Method: delete
+        WelcomeMessage:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+
+
+Outputs:
+  LeaderboardApi:
+    Description: "API Gateway endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  LeaderboardFunction:
+    Description: "Leaderboard Lambda Function ARN"
+    Value: !GetAtt LeaderboardFunction.Arn
+  LeaderboardFunctionIamRole:
+    Description: "Implicit IAM Role created for Leaderboard function"
+    Value: !GetAtt LeaderboardFunctionRole.Arn
