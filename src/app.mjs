@@ -6,7 +6,6 @@ const client = new pg.Client({
     connectionString: NEON_DB_URL
 });
 
-await client.connect();
 
 // Handler function
 export async function handler(event) {
@@ -54,6 +53,7 @@ export async function handler(event) {
 // Function to retrieve the leaderboard
 async function getLeaderboard(limit) {
     try {
+        await client.connect();
         const res = await client.query('SELECT * FROM leaderboard ORDER BY points DESC LIMIT $1', [limit]);
         return {
             statusCode: 200,
@@ -71,6 +71,7 @@ async function getLeaderboard(limit) {
 // Function to get points for a specific participant
 async function getParticipantPoints(userID) {
     try {
+        await client.connect();
         const res = await client.query('SELECT * FROM leaderboard WHERE user_id = $1', [userID]);
         if (res.rows.length) {
             return {
@@ -95,6 +96,7 @@ async function getParticipantPoints(userID) {
 // Function to add points to a participant's score
 async function addPoints(userID, pointsToAdd) {
     try {
+        await client.connect();
         let res = await client.query('UPDATE leaderboard SET points = points + $1 WHERE user_id = $2 RETURNING points', [pointsToAdd, userID]);
         if (res.rows.length === 0) {
             res = await client.query('INSERT INTO leaderboard (user_id, points) VALUES ($1, $2) RETURNING points', [userID, pointsToAdd]);
@@ -115,6 +117,7 @@ async function addPoints(userID, pointsToAdd) {
 // Function to delete a participant from the leaderboard
 async function deleteParticipant(userID) {
     try {
+        await client.connect();
         await client.query('DELETE FROM leaderboard WHERE user_id = $1', [userID]);
         return {
             statusCode: 200,
