@@ -11,8 +11,13 @@ const client = new pg.Client({
 export async function handler(event) {
     console.log('Event:', event);
     try {
-        const httpMethod = event.requestContext.httpMethod;
-        const path = event.requestContext.path;
+
+
+
+        const httpMethod = event.requestContext.http ? event.requestContext.http.method : event.requestContext.httpMethod;
+        const path = event.requestContext.http ? event.requestContext.http.path : event.requestContext.path;
+
+
 
         console.log(`HTTP method: ${httpMethod}`);
         console.log(`Path: ${path}`);
