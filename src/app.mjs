@@ -1,18 +1,14 @@
-// Import the PostgreSQL client using ES Modules syntax
 import pg from 'pg';
 
-// Database connection URL
 const NEON_DB_URL = "postgresql://Leaderboard_owner:6i0VTIBxuwrq@ep-square-brook-a56bzbfg.us-east-2.aws.neon.tech/Leaderboard?sslmode=require";
 
-// Create a new PostgreSQL client instance
 const client = new pg.Client({
     connectionString: NEON_DB_URL
 });
 
-// Connect to the PostgreSQL database
 await client.connect();
 
-// Lambda handler function
+// Handler function
 export async function handler(event) {
     console.log('Event:', event);
     try {
